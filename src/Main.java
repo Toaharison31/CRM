@@ -6,7 +6,7 @@ public class Main {
 
         // INSERTION AO ANATY CLAS/TABLE Client 
         /***Exemple nanaovana test ito */
-        Client client = new Client("NJAKANERA Nostos Duk'S Stakkino", "jhenStakkino@gmail.com", "0388086533", "Filatex", "Ankatso", "actif");
+        Client client = new Client(1, "NJAKANERA Nostos Duk'S Stakkino", "jhenStakkino@gmail.com", "0388086533", "Filatex", "Ankatso", "actif");
         System.out.println(client.insertClient());
     }
 }

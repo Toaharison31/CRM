@@ -2,7 +2,7 @@ package models;
 
 /* CLIENT CLASS */
 public class Client {
-    // private int id;
+    private int id;
     private String nom_complet;
     private String email;
     private String telephone;
@@ -11,9 +11,9 @@ public class Client {
     private String statut;
 
     /* CLIENT CONSTRUCTOR */
-    public Client(String nom_complet, String email, String telephone, String entreprise, String adresse,
+    public Client(int id, String nom_complet, String email, String telephone, String entreprise, String adresse,
             String statut) {
-        // this.id = id;
+        this.id = id;
         this.nom_complet = nom_complet;
         this.email = email;
         this.telephone = telephone;
@@ -25,15 +25,15 @@ public class Client {
     // GETTERS and SETTERS for Client
 
     /* Client id getter and setter */
-    /*
-     * public int getId() {
-     * return id;
-     * }
-     * 
-     * public void setId(int id) {
-     * this.id = id;
-     * }
-     */
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     /* Client nom_complet getter and setter */
     public String getNom_complet() {
         return nom_complet;
@@ -93,7 +93,7 @@ public class Client {
     /************************************************************************************************* */
     @Override
     public String toString() {
-        return "Client { nom='" + nom_complet + "', email='" + email + "', téléphone='" + telephone
+        return "Client { id=" + id + ", nom='" + nom_complet + "', email='" + email + "', téléphone='" + telephone
                 + "', entreprise= '" + entreprise + "', adresse= '" + adresse + "', statut= '" + statut + "' }";
     }
 
@@ -106,7 +106,6 @@ public class Client {
         String sql = "INSERT INTO client (nom_complet, email, telephone, entreprise, adresse, statut) VALUES (?, ?, ?, ?, ?, ?);";
 
         // Utilisation de la connexion à la base de données pour exécuter la requête
-        // d'insertion
         try {
             java.sql.Connection conn = databases.Connexion.getConnection();
             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
