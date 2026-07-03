@@ -2,7 +2,7 @@ package models;
 
 /* CLIENT CLASS */
 public class Client {
-    private int id;
+    // private int id;
     private String nom_complet;
     private String email;
     private String telephone;
@@ -11,9 +11,9 @@ public class Client {
     private String statut;
 
     /* CLIENT CONSTRUCTOR */
-    public Client(int id, String nom_complet, String email, String telephone, String entreprise, String adresse,
+    public Client(String nom_complet, String email, String telephone, String entreprise, String adresse,
             String statut) {
-        this.id = id;
+        // this.id = id;
         this.nom_complet = nom_complet;
         this.email = email;
         this.telephone = telephone;
@@ -25,14 +25,15 @@ public class Client {
     // GETTERS and SETTERS for Client
 
     /* Client id getter and setter */
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    /*
+     * public int getId() {
+     * return id;
+     * }
+     * 
+     * public void setId(int id) {
+     * this.id = id;
+     * }
+     */
     /* Client nom_complet getter and setter */
     public String getNom_complet() {
         return nom_complet;
@@ -92,8 +93,44 @@ public class Client {
     /************************************************************************************************* */
     @Override
     public String toString() {
-        return "Client { id=" + id + ", nom='" + nom_complet + "', email='" + email + "', téléphone='" + telephone
+        return "Client { nom='" + nom_complet + "', email='" + email + "', téléphone='" + telephone
                 + "', entreprise= '" + entreprise + "', adresse= '" + adresse + "', statut= '" + statut + "' }";
+    }
+
+    /************************************************************************************************* */
+    /* INSERT INTO DATABASE gestion_crm */
+    /************************************************************************************************* */
+    public String insertClient() {
+
+        // Requête SQL pour insérer un client dans la table client
+        String sql = "INSERT INTO client (nom_complet, email, telephone, entreprise, adresse, statut) VALUES (?, ?, ?, ?, ?, ?);";
+
+        // Utilisation de la connexion à la base de données pour exécuter la requête
+        // d'insertion
+        try {
+            java.sql.Connection conn = databases.Connexion.getConnection();
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+
+            // Valeurs à insérer dans la requête préparée
+            pstmt.setString(1, this.nom_complet);
+            pstmt.setString(2, this.email);
+            pstmt.setString(3, this.telephone);
+            pstmt.setString(4, this.entreprise);
+            pstmt.setString(5, this.adresse);
+            pstmt.setString(6, this.statut);
+
+            // Executer la requête d'insertion
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+
+            // Retourner un message de succès avec les détails du client inséré
+            return "Client enregistré avec succès : " + this.toString();
+        }
+        // Gestion des exceptions SQL
+        catch (java.sql.SQLException e) {
+            return "Error inserting client: " + e.getMessage();
+        }
     }
 
 }

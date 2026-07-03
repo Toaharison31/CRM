@@ -5,7 +5,8 @@ public class Main {
         System.out.println("Welcome to CRM Analytics Dashboard");
 
         // INSERTION AO ANATY CLAS/TABLE Client 
-        Client client = new Client(1, "RANAIVOARISON Anjanirina Toavina", "toaharison@gmail.com", "0385241577", "YALP Dev", "Lot IB 68 Bis Antanambao", "déconnecté");
-        System.out.println(client);
+        /***Exemple nanaovana test ito */
+        Client client = new Client("NJAKANERA Nostos Duk'S Stakkino", "jhenStakkino@gmail.com", "0388086533", "Filatex", "Ankatso", "actif");
+        System.out.println(client.insertClient());
     }
 }
