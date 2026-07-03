@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS opportunite (
     valeur DECIMAL(15,2) DEFAULT 0.00, 
     etape VARCHAR(30) CHECK (etape IN ('prospect','qualifié','proposition','gagné','perdu')), 
     date_cloture DATE, 
-    cree_le TIMESTAMP DEFAULT NOW() 
+    cree_le TIMESTAMP DEFAULT NOW(),
     cree_par INTEGER REFERENCES utilisateur(id)); 
  
  
