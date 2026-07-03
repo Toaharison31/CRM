@@ -28,7 +28,7 @@ public class Connexion {
             try {
                 connection.close();
             } catch (SQLException e) {
-                System.out.println(e);
+                e.getStackTrace();
             } finally {
                 connection = null;
             }

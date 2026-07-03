@@ -1,17 +1,18 @@
 package models;
 
 import java.sql.Timestamp;
+import org.json.JSONObject;
 
 /* RAPPORT CLASS */
 public class Rapport {
     private int id;
     private char type_rapport;
     private int genere_par;
-    private String donnees;
+    private JSONObject donnees;
     private Timestamp cree_le;
 
     /* RAPPORT CONSTRUCTOR */
-    public Rapport(int id, char type_rapport, int genere_par, String donnees, Timestamp cree_le) {
+    public Rapport(int id, char type_rapport, int genere_par, JSONObject donnees, Timestamp cree_le) {
         this.id = id;
         this.type_rapport = type_rapport;
         this.genere_par = genere_par;
@@ -48,11 +49,11 @@ public class Rapport {
     }
 
     /* Rapport donnees getters and setters */
-    public String getDonnees() {
+    public JSONObject getDonnees() {
         return donnees;
     }
 
-    public void setDonnees(String donnees) {
+    public void setDonnees(JSONObject donnees) {
         this.donnees = donnees;
     }
 
