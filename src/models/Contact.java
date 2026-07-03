@@ -13,7 +13,13 @@ public class Contact {
     }
 
     /* CONTACT CONSTRUCTOR */
-    public Contact(int id, int id_client, String type_contact, String notes, String date_contact, int cree_par) {
+    public Contact(
+            int id,
+            int id_client,
+            String type_contact,
+            String notes,
+            String date_contact,
+            int cree_par) {
         this.id = id;
         this.id_client = id_client;
         this.type_contact = type_contact;
@@ -84,40 +90,5 @@ public class Contact {
     public String toString() {
         return "Contact { id=" + id + ", id_client=" + id_client + ", type_contact=" + type_contact + ", notes=" + notes
                 + ", date_contact=" + date_contact + ", cree_par=" + cree_par + " }";
-    }
-
-    /************************************************************************************************* */
-    // INSERT INTO CONTACT TABLE
-    /************************************************************************************************* */
-    public String insertContact() {
-        String sql = "INSERT INTO contact (id_client, type_contact, notes, date_contact, cree_par) VALUES (?, ?, ?, ?, ?)";
-
-        try {
-            // Assuming you have a method to get a database connection
-            java.sql.Connection conn = databases.Connexion.getConnection();
-            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            // Ampidirina ao anaty ny requete ao amin'ny prepared statement
-            pstmt.setInt(1, this.id_client);
-            pstmt.setString(2, this.type_contact);
-            pstmt.setString(3, this.notes);
-            pstmt.setString(4, this.date_contact);
-            pstmt.setInt(5, this.cree_par);
-
-
-            // Exécuter la requête d'insertion et vérifier si l'insertion a réussi
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                return "Contact inseré avec succès.";
-            } else {
-                return "Erreur lors de l'insertion du contact.";
-            }
-        } 
-
-        // Excéption handling
-        catch (java.sql.SQLException e) {
-            e.printStackTrace();
-            return "Erreur lors de l'insertion du contact: " + e.getMessage();
-        }
     }
 }

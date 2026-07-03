@@ -2,11 +2,10 @@ import models.Client;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Welcome to CRM Analytics Dashboard");
+        System.out.println("\nWelcome to CRM Analytics Dashboard\n");
 
-        // INSERTION AO ANATY CLAS/TABLE Client 
-        /***Exemple nanaovana test ito */
-        Client client = new Client(1, "NJAKANERA Nostos Duk'S Stakkino", "jhenStakkino@gmail.com", "0388086533", "Filatex", "Ankatso", "actif");
-        System.out.println(client.insertClient());
+        // INSERTION AO ANATY CLASS/TABLE Client
+        Client client = new Client(1, "Marie Dupont", "marie.dupont@gmail.com", "0380000000", "Oracle", "Antananarivo", "actif");
+        System.out.println(client + "\n");
     }
 }

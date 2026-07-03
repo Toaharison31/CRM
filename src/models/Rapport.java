@@ -12,7 +12,12 @@ public class Rapport {
     private Timestamp cree_le;
 
     /* RAPPORT CONSTRUCTOR */
-    public Rapport(int id, String type_rapport, int genere_par, JSONObject donnees, Timestamp cree_le) {
+    public Rapport(
+            int id,
+            String type_rapport,
+            int genere_par,
+            JSONObject donnees,
+            Timestamp cree_le) {
         this.id = id;
         this.type_rapport = type_rapport;
         this.genere_par = genere_par;
@@ -74,39 +79,6 @@ public class Rapport {
     public String toString() {
         return "Rapport { id=" + id + ", type_rapport=" + type_rapport + ", genere_par=" + genere_par
                 + ", donnees=" + donnees + ", cree_le=" + cree_le + " }";
-    }
-
-    /************************************************************************************************* */
-    // INSERT INTO RAPPORT TABLE
-    /************************************************************************************************* */
-    public String insertRapport() {
-        // Requête SQL pour insérer un rapport dans la base de données
-        String sql = "INSERT INTO rapport (type_rapport, genere_par, donnees, cree_le) VALUES (?, ?, ?, ?)";
-
-        // Exécuter la requête SQL pour insérer le rapport dans la base de données
-        try {
-
-            // Utilisation de la connexion à la base de données pour exécuter la requête
-            // d'insertion
-            java.sql.Connection conn = databases.Connexion.getConnection();
-            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            // Définir les paramètres de la requête SQL
-            pstmt.setString(1, this.type_rapport);
-            pstmt.setInt(2, this.genere_par);
-            pstmt.setString(3, this.donnees.toString());
-            pstmt.setTimestamp(4, this.cree_le);
-
-            // Exécuter la requête d'insertion
-            pstmt.executeUpdate();
-            pstmt.close();
-            conn.close();
-        }
-        // Excéption handling
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sql;
     }
 
 }

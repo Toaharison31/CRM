@@ -12,7 +12,13 @@ public class Utilisateur {
     private Timestamp cree_le;
 
     /* UTILISATEUR CONSTRUCTOR */
-    public Utilisateur(int id,String nom, String email, String mot_de_passe, String role, Timestamp cree_le) {
+    public Utilisateur(
+            int id,
+            String nom,
+            String email,
+            String mot_de_passe,
+            String role,
+            Timestamp cree_le) {
         this.id = id;
         this.nom = nom;
         this.email = email;
@@ -82,39 +88,5 @@ public class Utilisateur {
     @Override
     public String toString() {
         return "Utilisateur { id=" + id + ", nom='" + nom + "', email='" + email + "', mot_de_passe='" + mot_de_passe + "', role=" + role + ", cree_le=" + cree_le + " }";
-    }
-
-    /************************************************************************************************* */
-    /*INSERT INTO DATABASE gestion_crm */
-    /************************************************************************************************* */
-    public String insertUtilisateur() {
-
-        // Requête SQL pour insérer un utilisateur dans la table utilisateur
-        String sql = "INSERT INTO utilisateur (nom, email, mot_de_passe, role, cree_le) VALUES (?, ?, ?, ?, ?);";
-
-        // Utilisation de la connexion à la base de données pour exécuter la requête d'insertion
-        try {
-            java.sql.Connection conn = databases.Connexion.getConnection();
-            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            // Valeurs à insérer dans la requête préparée
-            pstmt.setString(1, this.nom);
-            pstmt.setString(2, this.email);
-            pstmt.setString(3, this.mot_de_passe);
-            pstmt.setString(4, this.role);
-            pstmt.setTimestamp(5, this.cree_le);
-
-            // Executer la requête d'insertion
-            pstmt.executeUpdate();
-            pstmt.close();
-            conn.close();
-
-            // Retourner un message de succès avec les détails de l'utilisateur inséré
-            return "Utilisateur enregistré avec succès : " + this.toString();
-        } 
-        // Gestion des exceptions SQL
-        catch (java.sql.SQLException e) {
-            return "Error inserting utilisateur: " + e.getMessage();
-        }
     }
 }
