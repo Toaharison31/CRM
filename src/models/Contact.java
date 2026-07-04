@@ -1,14 +1,14 @@
 package models;
 
-import java.util.Date;
-import org.w3c.dom.Text;
+import java.sql.Date;
+
 
 /*CONTACT CLASS */
 public class Contact {
     private int id;
     private int id_client;
-    private char type_contact;;
-    private Text notes;
+    private String type_contact;
+    private String notes;
     private Date date_contact;
     private int cree_par;
 
@@ -16,7 +16,7 @@ public class Contact {
     }
 
     /* CONTACT CONSTRUCTOR */
-    public Contact(int id, int id_client, char type_contact, Text notes, Date date_contact, int cree_par) {
+    public Contact(int id, int id_client, String type_contact, String notes, Date date_contact, int cree_par) {
         this.id = id;
         this.id_client = id_client;
         this.type_contact = type_contact;
@@ -45,20 +45,20 @@ public class Contact {
     }
 
     /* Contact type_contact getter and setter */
-    public char getType_contact() {
+    public String getType_contact() {
         return type_contact;
     }
 
-    public void setType_contact(char type_contact) {
+    public void setType_contact(String type_contact) {
         this.type_contact = type_contact;
     }
 
     /* Contact notes getter and setter */
-    public Text getNotes() {
+    public String getNotes() {
         return notes;
     }
 
-    public void setNotes(Text notes) {
+    public void setNotes(String notes) {
         this.notes = notes;
     }
 

@@ -1,23 +1,22 @@
 package models;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import org.w3c.dom.Text;
+import java.sql.Date;
 
 /* ACTIVITE CLASS */
 public class Activite {
     private int id;
     private int id_utilisateur;
     private int id_opportunite;
-    private char type_activite;
-    private Text description;
+    private String type_activite;
+    private String description;
     private Date date_echeance;
-    private char statut;
+    private String statut;
     private Timestamp cree_le;
 
     /* ACTIVITE CONSTRUCTOR */
-    public Activite(int id, int id_utilisateur, int id_opportunite, char type_activite, Text description,
-            Date date_echeance, char statut, Timestamp cree_le) {
+    public Activite(int id, int id_utilisateur, int id_opportunite, String type_activite, String description,
+            Date date_echeance, String statut, Timestamp cree_le) {
         this.id = id;
         this.id_utilisateur = id_utilisateur;
         this.id_opportunite = id_opportunite;
@@ -57,20 +56,20 @@ public class Activite {
     }
 
     /* Activite type_activite getter and setter */
-    public char getType_activite() {
+    public String getType_activite() {
         return type_activite;
     }
 
-    public void setType_activite(char type_activite) {
+    public void setType_activite(String type_activite) {
         this.type_activite = type_activite;
     }
 
     /* Activite description getter and setter */
-    public Text getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(Text description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -84,11 +83,11 @@ public class Activite {
     }
 
     /* Activite statut getter and setter */
-    public char getStatut() {
+    public String getStatut() {
         return statut;
     }
 
-    public void setStatut(char statut) {
+    public void setStatut(String statut) {
         this.statut = statut;
     }
 
