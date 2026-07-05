@@ -2,6 +2,7 @@ package dao;
 
 import databases.Connexion;
 import models.Utilisateur;
+import utils.PasswordUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,15 +11,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**Data Access Object pour les utilisateurs.
+ Gère l'authentification sécurisée avec hachage de mots de passe.*/
 public class UtilisateurDAO {
-    /* Convertir une ligne les parametres de l'utilisateur */
+    
+    /** Remplit les paramètres d'un PreparedStatement avec les données d'un utilisateur.
+     IMPORTANTE: Le mot de passe est crypté avant d'être stocké.*/
     private void remplirUtilisateur(PreparedStatement ps, Utilisateur u) throws SQLException {
         ps.setString(1, u.getNom());
         ps.setString(2, u.getEmail());
-        ps.setString(3, u.getMot_de_passe());
+        // Hache le mot de passe avant stockage
+        ps.setString(3, PasswordUtils.hashPassword(u.getMot_de_passe()));
         ps.setString(4, u.getRole());
     }
-    /* Convertir une ligne ResultSet en objet Utilisateur */
+    
+    /** Convertit une ligne ResultSet en objet Utilisateur.*/
     private Utilisateur mapResultSetToUtilisateur(ResultSet rs) throws SQLException {
         return new Utilisateur(
                 rs.getInt("id"),
@@ -30,53 +37,93 @@ public class UtilisateurDAO {
         );
     }
 
-    
-    /* 1. UML: seConnecter() -> Fanamarinana ho an'ny Login */
+    /**
+     * Authentifie un utilisateur avec vérification du mot de passe haché.
+     * SÉCURISÉ: Compare contre le hash stocké sans jamais afficher les mots de passe.
+    @param email Email de l'utilisateur
+    @param mdp Mot de passe en clair (sera haché pour comparaison)
+    @return Utilisateur authentifié ou null si échec */
     public Utilisateur seConnecter(String email, String mdp) {
-        String sql = "SELECT * FROM utilisateur WHERE email = ? AND mot_de_passe = ?";
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM utilisateur WHERE email = ?";
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
-            ps.setString(2, mdp);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    System.out.println("Connexion réussie pour : " + email);
-                    return mapResultSetToUtilisateur(rs);
+                    Utilisateur u = mapResultSetToUtilisateur(rs);
+                    // Vérifie le mot de passe haché de manière sécurisée
+                    if (PasswordUtils.verifyPassword(mdp, u.getMot_de_passe())) {
+                        System.out.println("✓ Authentification réussie pour: " + email);
+                        return u;
+                    } else {
+                        System.out.println("⚠ Mot de passe incorrect pour: " + email);
+                        return null;
+                    }
                 }
             }
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de la connexion : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de l'authentification: " + e.getMessage());
         }
-        System.out.println("Échec de connexion pour : " + email);
+        System.out.println("⚠ Utilisateur non trouvé: " + email);
         return null;
     }
 
-
-    /* 2. UML: seDeconnecter() -> Lojika fialana tsotra */
+    /**
+     * Déconnecte un utilisateur (log déconnexion).
+     * 
+     * @param email Email de l'utilisateur à déconnecter
+     */
     public void seDeconnecter(String email) {
-        System.out.println("Déconnexion de l'utilisateur : " + email);
+        System.out.println("✓ Déconnexion de l'utilisateur: " + email);
+        // À améliorer: implémenter une vraie gestion de session
     }
 
-    
-    /* 3. UML: changerMdp() -> Fanovana tenimiafina */
+    /**
+     * Change le mot de passe d'un utilisateur avec validation et hachage.
+     * 
+     * @param id ID de l'utilisateur
+     * @param nouvMdp Nouveau mot de passe en clair
+     * @return true si succès
+     */
     public boolean changerMdp(int id, String nouvMdp) {
+        // Valide la force du mot de passe
+        String validationError = PasswordUtils.validatePasswordStrength(nouvMdp);
+        if (!validationError.isEmpty()) {
+            System.err.println("❌ Mot de passe faible: " + validationError);
+            return false;
+        }
+        
         String sql = "UPDATE utilisateur SET mot_de_passe = ? WHERE id = ?";
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, nouvMdp);
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            // Hache le nouveau mot de passe avant stockage
+            ps.setString(1, PasswordUtils.hashPassword(nouvMdp));
             ps.setInt(2, id);
-            return ps.executeUpdate() > 0;
+            boolean success = ps.executeUpdate() > 0;
+            if (success) {
+                System.out.println("✓ Mot de passe changé pour utilisateur ID: " + id);
+            } else {
+                System.err.println("❌ Utilisateur non trouvé: ID " + id);
+            }
+            return success;
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors du changement de mot de passe : " + e.getMessage());
+            System.err.println("❌ ERREUR lors du changement de mot de passe: " + e.getMessage());
             return false;
         }
     }
 
-    
-    /* 4. UML: verifierRole() -> Mijery ny role an'ny utilisateur iray */
+    /**
+     * Vérifie le rôle d'un utilisateur.
+     * 
+     * @param id ID de l'utilisateur
+     * @return Rôle de l'utilisateur ou null si non trouvé
+     */
     public String verifierRole(int id) {
         String sql = "SELECT role FROM utilisateur WHERE id = ?";
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -85,65 +132,103 @@ public class UtilisateurDAO {
             }
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de la vérification du rôle : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de la vérification du rôle: " + e.getMessage());
         }
         return null;
     }
 
-    
-    /* FANAMPIANA: Ajouter un utilisateur */
+    /**
+     * Ajoute un nouvel utilisateur avec mot de passe haché.
+     * 
+     * @param u Utilisateur à ajouter
+     * @return true si succès
+     */
     public boolean ajouterUtilisateur(Utilisateur u) {
+        // Valide les paramètres de base
+        if (u == null || u.getNom() == null || u.getEmail() == null) {
+            System.err.println("❌ Données utilisateur invalides");
+            return false;
+        }
+        
         String sql = """
                 INSERT INTO utilisateur(nom, email, mot_de_passe, role)
                 VALUES (?, ?, ?, ?)
                 """;
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             remplirUtilisateur(ps, u);
-            return ps.executeUpdate() > 0;
+            boolean success = ps.executeUpdate() > 0;
+            if (success) {
+                System.out.println("✓ Utilisateur créé: " + u.getEmail());
+            }
+            return success;
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de l'ajout d'utilisateur: " + e.getMessage());
             return false;
         }
     }
 
-    
-    /* FANAMPIANA: Modifier un utilisateur */
+    /**
+     * Modifie un utilisateur existant.
+     * 
+     * @param u Utilisateur à modifier
+     * @return true si succès
+     */
     public boolean modifierUtilisateur(Utilisateur u) {
         String sql = """
                 UPDATE utilisateur SET nom = ?, email = ?, mot_de_passe = ?, role = ?
                 WHERE id = ?
                 """;
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             remplirUtilisateur(ps, u);
             ps.setInt(5, u.getId());
-            return ps.executeUpdate() > 0;
+            boolean success = ps.executeUpdate() > 0;
+            if (success) {
+                System.out.println("✓ Utilisateur modifié: " + u.getEmail());
+            }
+            return success;
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de la modification de l'utilisateur : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de la modification: " + e.getMessage());
             return false;
         }
     }
 
-    
-    /* FANAMPIANA: Supprimer un utilisateur */
+    /**
+     * Supprime un utilisateur.
+     * 
+     * @param id ID de l'utilisateur à supprimer
+     * @return true si succès
+     */
     public boolean supprimerUtilisateur(int id) {
         String sql = "DELETE FROM utilisateur WHERE id = ?";
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            boolean success = ps.executeUpdate() > 0;
+            if (success) {
+                System.out.println("✓ Utilisateur supprimé: ID " + id);
+            }
+            return success;
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de la suppression de l'utilisateur : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de la suppression: " + e.getMessage());
             return false;
         }
     }
 
-    
-    /* FANAMPIANA: Rechercher par ID */
+    /**
+     * Recherche un utilisateur par son ID.
+     * 
+     * @param id ID de l'utilisateur
+     * @return Utilisateur trouvé ou null
+     */
     public Utilisateur rechercherParId(int id) {
         String sql = "SELECT * FROM utilisateur WHERE id = ?";
-        try (Connection conn = Connexion.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Connexion.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -152,13 +237,15 @@ public class UtilisateurDAO {
             }
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de la recherche de l'utilisateur : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de la recherche: " + e.getMessage());
         }
         return null;
     }
 
-    
-    /* FANAMPIANA: Rechercher tous les utilisateurs */
+    /**
+     * Récupère tous les utilisateurs.
+     * @return Liste de tous les utilisateurs
+     */
     public List<Utilisateur> rechercherTous() {
         List<Utilisateur> liste = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur ORDER BY id DESC";
@@ -170,7 +257,7 @@ public class UtilisateurDAO {
             }
         } 
         catch (SQLException e) {
-            System.out.println("Erreur lors de la récupération des utilisateurs : " + e.getMessage());
+            System.err.println("❌ ERREUR lors de la récupération: " + e.getMessage());
         }
         return liste;
     }
