@@ -4,3 +4,6 @@ hs_err_pid14432.log
 /nbproject
 *.xml
 *.mf
+*.txt
+lib/
+out/

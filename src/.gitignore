@@ -1,4 +1,6 @@
 *.log
 psql/Lien.java
 utils
-RAPPORT_SECURITE.txt
+*.txt
+lib/
+out/
