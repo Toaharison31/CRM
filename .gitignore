@@ -1,8 +1,9 @@
 hs_err_pid14432.log
 *.log
 .vscode
-/nbproject
 *.xml
 *.mf
+Lien.java
 *.txt
 out
+lib

@@ -2,8 +2,9 @@ package dao;
 
 import databases.Connexion;
 import models.Utilisateur;
-import utils.PasswordUtils;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,13 +16,32 @@ import java.util.List;
  Gère l'authentification sécurisée avec hachage de mots de passe.*/
 public class UtilisateurDAO {
     
-    /** Remplit les paramètres d'un PreparedStatement avec les données d'un utilisateur.
-     IMPORTANTE: Le mot de passe est crypté avant d'être stocké.*/
+    /**
+     * Fomba pro hikilasiana ny teny miafina ho SHA-256 (Hachage mivantana eto amin'ny DAO)
+     */
+    private String hashSHA256(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Erreur de hachage: " + e.getMessage());
+            return password; // Fallback raha misy olana saingy tsy tokony hisy
+        }
+    }
+    
+    /** Remplit les paramètres d'un PreparedStatement avec les données d'un utilisateur.*/
     private void remplirUtilisateur(PreparedStatement ps, Utilisateur u) throws SQLException {
         ps.setString(1, u.getNom());
         ps.setString(2, u.getEmail());
-        // Hache le mot de passe avant stockage
-        ps.setString(3, PasswordUtils.hashPassword(u.getMot_de_passe()));
+        // Hache mivantana amin'ny alalan'ny SHA-256 eto amin'ny DAO
+        ps.setString(3, hashSHA256(u.getMot_de_passe()));
         ps.setString(4, u.getRole());
     }
     
@@ -39,10 +59,7 @@ public class UtilisateurDAO {
 
     /**
      * Authentifie un utilisateur avec vérification du mot de passe haché.
-     * SÉCURISÉ: Compare contre le hash stocké sans jamais afficher les mots de passe.
-    @param email Email de l'utilisateur
-    @param mdp Mot de passe en clair (sera haché pour comparaison)
-    @return Utilisateur authentifié ou null si échec */
+     */
     public Utilisateur seConnecter(String email, String mdp) {
         String sql = "SELECT * FROM utilisateur WHERE email = ?";
         try (Connection conn = Connexion.getConnection(); 
@@ -51,8 +68,9 @@ public class UtilisateurDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Utilisateur u = mapResultSetToUtilisateur(rs);
-                    // Vérifie le mot de passe haché de manière sécurisée
-                    if (PasswordUtils.verifyPassword(mdp, u.getMot_de_passe())) {
+                    
+                    // Manamarina ny hash SHA-256 mivantana eto
+                    if (hashSHA256(mdp).equals(u.getMot_de_passe())) {
                         System.out.println("Authentification réussie pour: " + email);
                         return u;
                     } else {
@@ -65,44 +83,31 @@ public class UtilisateurDAO {
         catch (SQLException e) {
             System.err.println("ERREUR lors de l'authentification: " + e.getMessage());
         }
-        System.out.println("⚠ Utilisateur non trouvé: " + email);
+        System.out.println("Utilisateur non trouvé: " + email);
         return null;
     }
 
-    /**
-     * Déconnecte un utilisateur (log déconnexion).
-     * 
-     * @param email Email de l'utilisateur à déconnecter
-     */
     public void seDeconnecter(String email) {
-        System.out.println("✓ Déconnexion de l'utilisateur: " + email);
-        // À améliorer: implémenter une vraie gestion de session
+        System.out.println("Déconnexion de l'utilisateur: " + email);
     }
 
     /**
-     * Change le mot de passe d'un utilisateur avec validation et hachage.
-     * 
-     * @param id ID de l'utilisateur
-     * @param nouvMdp Nouveau mot de passe en clair
-     * @return true si succès
+     * Change le mot de passe d'un utilisateur.
      */
     public boolean changerMdp(int id, String nouvMdp) {
-        // Valide la force du mot de passe
-        String validationError = PasswordUtils.validatePasswordStrength(nouvMdp);
-        if (!validationError.isEmpty()) {
-            System.err.println("Mot de passe faible: " + validationError);
+        if (nouvMdp == null || nouvMdp.trim().length() < 4) {
+            System.err.println("Mot de passe faible");
             return false;
         }
         
         String sql = "UPDATE utilisateur SET mot_de_passe = ? WHERE id = ?";
         try (Connection conn = Connexion.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            // Hache le nouveau mot de passe avant stockage
-            ps.setString(1, PasswordUtils.hashPassword(nouvMdp));
+            ps.setString(1, hashSHA256(nouvMdp));
             ps.setInt(2, id);
             boolean success = ps.executeUpdate() > 0;
             if (success) {
-                System.out.println("✓ Mot de passe changé pour utilisateur ID: " + id);
+                System.out.println("Mot de passe changé pour utilisateur ID: " + id);
             } else {
                 System.err.println("Utilisateur non trouvé: ID " + id);
             }
@@ -114,12 +119,6 @@ public class UtilisateurDAO {
         }
     }
 
-    /**
-     * Vérifie le rôle d'un utilisateur.
-     * 
-     * @param id ID de l'utilisateur
-     * @return Rôle de l'utilisateur ou null si non trouvé
-     */
     public String verifierRole(int id) {
         String sql = "SELECT role FROM utilisateur WHERE id = ?";
         try (Connection conn = Connexion.getConnection(); 
@@ -137,14 +136,7 @@ public class UtilisateurDAO {
         return null;
     }
 
-    /**
-     * Ajoute un nouvel utilisateur avec mot de passe haché.
-     * 
-     * @param u Utilisateur à ajouter
-     * @return true si succès
-     */
     public boolean ajouterUtilisateur(Utilisateur u) {
-        // Valide les paramètres de base
         if (u == null || u.getNom() == null || u.getEmail() == null) {
             System.err.println("Données utilisateur invalides");
             return false;
@@ -169,12 +161,6 @@ public class UtilisateurDAO {
         }
     }
 
-    /**
-     * Modifie un utilisateur existant.
-     * 
-     * @param u Utilisateur à modifier
-     * @return true si succès
-     */
     public boolean modifierUtilisateur(Utilisateur u) {
         String sql = """
                 UPDATE utilisateur SET nom = ?, email = ?, mot_de_passe = ?, role = ?
@@ -196,12 +182,6 @@ public class UtilisateurDAO {
         }
     }
 
-    /**
-     * Supprime un utilisateur.
-     * 
-     * @param id ID de l'utilisateur à supprimer
-     * @return true si succès
-     */
     public boolean supprimerUtilisateur(int id) {
         String sql = "DELETE FROM utilisateur WHERE id = ?";
         try (Connection conn = Connexion.getConnection(); 
@@ -219,12 +199,6 @@ public class UtilisateurDAO {
         }
     }
 
-    /**
-     * Recherche un utilisateur par son ID.
-     * 
-     * @param id ID de l'utilisateur
-     * @return Utilisateur trouvé ou null
-     */
     public Utilisateur rechercherParId(int id) {
         String sql = "SELECT * FROM utilisateur WHERE id = ?";
         try (Connection conn = Connexion.getConnection(); 
@@ -242,10 +216,6 @@ public class UtilisateurDAO {
         return null;
     }
 
-    /**
-     * Récupère tous les utilisateurs.
-     * @return Liste de tous les utilisateurs
-     */
     public List<Utilisateur> rechercherTous() {
         List<Utilisateur> liste = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur ORDER BY id DESC";
