@@ -4,3 +4,14 @@ hs_err_pid14432.log
 /nbproject
 *.xml
 *.mf
+*.class
+
+target/
+
+.settings/
+.bin/
+.classpath
+.project
+
+.DS_Store
+Thumbs.db
