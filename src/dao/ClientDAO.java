@@ -14,7 +14,6 @@ import java.util.List;
 
 public class ClientDAO {
     /* Convertir une ligne les parametre du client*/
-    /* Convertir une ligne ResultSet en objet Client*/
     private void remplirClient(PreparedStatement ps, Client client) throws SQLException {
         ps.setString(1, client.getNom_complet());
         ps.setString(2, client.getEmail());
@@ -23,7 +22,8 @@ public class ClientDAO {
         ps.setString(5, client.getAdresse());
         ps.setString(6, client.getStatut());
     }
-
+    
+    /* Convertir une ligne ResultSet en objet Client*/
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
         return new Client(
                 rs.getInt("id"),
@@ -34,8 +34,21 @@ public class ClientDAO {
                 rs.getString("adresse"),
                 rs.getString("statut"));
     }
+    
 
+    /*---------------------------------------------------------------*/
+    /* Enregistrer un client : ajout ou modification selon l'existence de l'id */
+    public boolean sauvegarderClient(Client client) {
+        if (client == null) {
+            return false;
+        }
 
+        if (client.getId() > 0) {
+            return modifierClient(client);
+        }
+
+        return ajouterClient(client);
+    }
 
     /*---------------------------------------------------------------*/
     /* Ajouter un nouveau client*/

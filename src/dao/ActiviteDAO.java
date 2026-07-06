@@ -69,7 +69,7 @@ public class ActiviteDAO {
     /* 3. UML: listerEnAttente() -> Maka ny asa mbola 'en attente' */
     public List<Activite> listerEnAttente() {
         List<Activite> liste = new ArrayList<>();
-        String sql = "SELECT * FROM activite WHERE statut = 'en attente' ORDER BY date_echeance ASC";
+        String sql = "SELECT * FROM activite WHERE statut = 'En attente' ORDER BY date_echeance ASC";
         try (Connection conn = Connexion.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
