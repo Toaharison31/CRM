@@ -1,11 +1,15 @@
-import models.Client;
+import ui.LoginFrame;
+import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Welcome to CRM Analytics Dashboard");
-
-        // INSERTION AO ANATY CLAS/TABLE Client 
-        Client client = new Client(1, "RANAIVOARISON Anjanirina Toavina", "toaharison@gmail.com", "0385241577", "YALP Dev", "Lot IB 68 Bis Antanambao", "déconnecté");
-        System.out.println(client);
+        // Manomboka ny Interface Swing amin'ny fomba azo antoka (Thread-safe)
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("🚀 Fandefasana ny CRM Analytics...");
+            
+            // Mamorona sy mampiseho ny pejy fidirana (Login)
+            LoginFrame login = new LoginFrame();
+            login.setVisible(true);
+        });
     }
 }
