@@ -53,17 +53,17 @@ public class UtilisateurDAO {
                     Utilisateur u = mapResultSetToUtilisateur(rs);
                     // Vérifie le mot de passe haché de manière sécurisée
                     if (PasswordUtils.verifyPassword(mdp, u.getMot_de_passe())) {
-                        System.out.println("✓ Authentification réussie pour: " + email);
+                        System.out.println("Authentification réussie pour: " + email);
                         return u;
                     } else {
-                        System.out.println("⚠ Mot de passe incorrect pour: " + email);
+                        System.out.println("Mot de passe incorrect pour: " + email);
                         return null;
                     }
                 }
             }
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de l'authentification: " + e.getMessage());
+            System.err.println("ERREUR lors de l'authentification: " + e.getMessage());
         }
         System.out.println("⚠ Utilisateur non trouvé: " + email);
         return null;
@@ -90,7 +90,7 @@ public class UtilisateurDAO {
         // Valide la force du mot de passe
         String validationError = PasswordUtils.validatePasswordStrength(nouvMdp);
         if (!validationError.isEmpty()) {
-            System.err.println("❌ Mot de passe faible: " + validationError);
+            System.err.println("Mot de passe faible: " + validationError);
             return false;
         }
         
@@ -104,12 +104,12 @@ public class UtilisateurDAO {
             if (success) {
                 System.out.println("✓ Mot de passe changé pour utilisateur ID: " + id);
             } else {
-                System.err.println("❌ Utilisateur non trouvé: ID " + id);
+                System.err.println("Utilisateur non trouvé: ID " + id);
             }
             return success;
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors du changement de mot de passe: " + e.getMessage());
+            System.err.println("ERREUR lors du changement de mot de passe: " + e.getMessage());
             return false;
         }
     }
@@ -132,7 +132,7 @@ public class UtilisateurDAO {
             }
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de la vérification du rôle: " + e.getMessage());
+            System.err.println("ERREUR lors de la vérification du rôle: " + e.getMessage());
         }
         return null;
     }
@@ -146,7 +146,7 @@ public class UtilisateurDAO {
     public boolean ajouterUtilisateur(Utilisateur u) {
         // Valide les paramètres de base
         if (u == null || u.getNom() == null || u.getEmail() == null) {
-            System.err.println("❌ Données utilisateur invalides");
+            System.err.println("Données utilisateur invalides");
             return false;
         }
         
@@ -159,12 +159,12 @@ public class UtilisateurDAO {
             remplirUtilisateur(ps, u);
             boolean success = ps.executeUpdate() > 0;
             if (success) {
-                System.out.println("✓ Utilisateur créé: " + u.getEmail());
+                System.out.println("Utilisateur créé: " + u.getEmail());
             }
             return success;
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de l'ajout d'utilisateur: " + e.getMessage());
+            System.err.println("ERREUR lors de l'ajout d'utilisateur: " + e.getMessage());
             return false;
         }
     }
@@ -186,12 +186,12 @@ public class UtilisateurDAO {
             ps.setInt(5, u.getId());
             boolean success = ps.executeUpdate() > 0;
             if (success) {
-                System.out.println("✓ Utilisateur modifié: " + u.getEmail());
+                System.out.println("Utilisateur modifié: " + u.getEmail());
             }
             return success;
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de la modification: " + e.getMessage());
+            System.err.println("ERREUR lors de la modification: " + e.getMessage());
             return false;
         }
     }
@@ -209,12 +209,12 @@ public class UtilisateurDAO {
             ps.setInt(1, id);
             boolean success = ps.executeUpdate() > 0;
             if (success) {
-                System.out.println("✓ Utilisateur supprimé: ID " + id);
+                System.out.println("Utilisateur supprimé: ID " + id);
             }
             return success;
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de la suppression: " + e.getMessage());
+            System.err.println("ERREUR lors de la suppression: " + e.getMessage());
             return false;
         }
     }
@@ -237,7 +237,7 @@ public class UtilisateurDAO {
             }
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de la recherche: " + e.getMessage());
+            System.err.println("ERREUR lors de la recherche: " + e.getMessage());
         }
         return null;
     }
@@ -257,7 +257,7 @@ public class UtilisateurDAO {
             }
         } 
         catch (SQLException e) {
-            System.err.println("❌ ERREUR lors de la récupération: " + e.getMessage());
+            System.err.println("ERREUR lors de la récupération: " + e.getMessage());
         }
         return liste;
     }
