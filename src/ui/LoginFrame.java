@@ -92,7 +92,7 @@ public class LoginFrame extends JFrame {
         mainPanel.add(loginButton, gbc);
 
         JButton registerButton = new JButton("Créer un compte (Admin Only)");
-        registerButton.setFont(new Font("Bell MT", Font.PLAIN, 12));
+        registerButton.setFont(new Font("Bell MT", Font.PLAIN, 16));
         registerButton.setForeground(Color.GRAY);
         registerButton.setBorderPainted(false);
         registerButton.setContentAreaFilled(false);
@@ -213,7 +213,7 @@ public class LoginFrame extends JFrame {
         JTextField nomF = new JTextField(15);
         JTextField emailF = new JTextField(15);
         JPasswordField mdpF = new JPasswordField(15);
-        JComboBox<String> roleCombo = new JComboBox<>(new String[]{"admin", "commercial", "manager"});
+        JComboBox<String> roleCombo = new JComboBox<>(new String[]{"Admin", "Commercial", "Manager"});
 
         c.gridx = 0; c.gridy = 0; dialog.add(new JLabel("Nom :"), c);
         c.gridx = 1; dialog.add(nomF, c);
