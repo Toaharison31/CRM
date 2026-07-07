@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS client (
     telephone VARCHAR(15) NOT NULL UNIQUE, 
     entreprise VARCHAR(50) NOT NULL, 
     adresse VARCHAR(100) NOT NULL, 
-    statut VARCHAR(10) CHECK (statut IN ('actif','inactif')), 
+    statut VARCHAR(10) CHECK (statut IN ('Nouveau', 'Client', 'Potentiel', 'Inactif')), 
     cree_le TIMESTAMP DEFAULT NOW() ); 
 
 /*Utilisateur: 6 variables*/
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     nom VARCHAR(100), 
     email VARCHAR(100), 
     mot_de_passe VARCHAR(255),
-    role VARCHAR(20) CHECK (role IN ('admin','commercial','manager')), 
+    role VARCHAR(20) CHECK (role IN ('Admin','Commercial','Manager')), 
     cree_le TIMESTAMP DEFAULT NOW() );
 
  
