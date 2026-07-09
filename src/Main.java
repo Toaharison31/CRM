@@ -42,5 +42,4 @@ public class Main {
     public static void showActivites() {
         SwingUtilities.invokeLater(() -> new ActiviteFrame().setVisible(true));
     }
-
 }

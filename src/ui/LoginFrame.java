@@ -185,7 +185,7 @@ public class LoginFrame extends JFrame {
             Utilisateur admin = dao.seConnecter(email, mdp);
 
             // Fanamarinana: tsy maintsy misy ny kaonty ARY tsy maintsy "admin" ny role-ny
-            if (admin != null && "admin".equalsIgnoreCase(admin.getRole())) {
+            if (admin != null && "Admin".equalsIgnoreCase(admin.getRole())) {
                 authDialog.dispose(); // Akatona ity pejy kely ity
                 showRealRegisterForm(); // Sokafy ilay tena formulaire fampidirana olona
             } else {
@@ -265,7 +265,7 @@ public class LoginFrame extends JFrame {
         dialog.setVisible(true);
     }
 
-    public static void main(String[] args) {
+     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }
